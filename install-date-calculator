@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Install Date Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    table {
+      max-width: 400px;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid black;
+      text-align: center;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    td:hover {
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
+    .selected {
+      background-color: rgb(160, 192, 203) !important;
+    }
+    .other-month {
+      color: lightgray;
+    }
+    .calendar-container {
+      max-width: 400px;
+      margin: 0 auto 20px;
+    }
+    .interval-container {
+      padding: 5px;
+    }
+    .current-date {
+      background-color: lightgreen;
+    }
+  </style>
+</head>
+<body>
+  <div class="calendar-container">
+    <h1 id="currentMonthYear"></h1>
+    <div>
+      <button onclick="prevMonth()">Previous Month</button>
+      <button onclick="nextMonth()">Next Month</button>
+    </div>
+    <table id="calendar"></table>
+  </div>
+
+  <div class="interval-container">
+    <label for="interval">Select Interval:</label>
+    <select id="interval">
+      <option value="30">30 Days</option>
+      <option value="60">60 Days</option>
+      <option value="90">90 Days</option>
+    </select>
+    <button onclick="calculateNextInstallDate()">Calculate Next Install Date</button>
+    <p id="noticeDate"></p>
+    <p id="nextInstallDate"></p>
+  </div>
+
+  <script>
+    // Example holidays (replace or extend this list as needed)
+    const holidays = [
+      'YYYY-MM-DD', // Example: '2025-12-25'
+      'YYYY-MM-DD', // Example: '2026-01-01'
+    ];
+
+    // Optional holiday ranges (e.g. company shutdowns)
+    const dateRanges = [
+      ['YYYY-MM-DD', 'YYYY-MM-DD'] // Example: ['2025-12-20', '2026-01-02']
+    ];
+
+    // Convert date ranges into individual holiday entries
+    dateRanges.forEach(([start, end]) => {
+      let current = new Date(start);
+      const endDate = new Date(end);
+      while (current <= endDate) {
+        holidays.push(current.toISOString().split('T')[0]);
+        current.setDate(current.getDate() + 1);
+      }
+    });
+
+    let currentDate = new Date();
+
+    function renderCalendar() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      document.getElementById('currentMonthYear').innerText =
+        new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+      const table = document.getElementById('calendar');
+      table.innerHTML = '';
+
+      const headerRow = table.insertRow();
+      ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+        const cell = headerRow.insertCell();
+        cell.innerText = day;
+      });
+
+      let row = table.insertRow();
+      const firstDay = new Date(year, month, 1).getDay();
+
+      for (let i = 0; i < firstDay; i++) {
+        row.insertCell();
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const cell = row.insertCell();
+        cell.innerText = day;
+        cell.setAttribute('data-date', date.toISOString());
+
+        const dateStr = date.toISOString().split('T')[0];
+
+        if (holidays.includes(dateStr)) cell.classList.add('holiday');
+        if (date.toDateString() === new Date().toDateString()) cell.classList.add('current-date');
+
+        cell.onclick = () => selectDate(cell);
+
+        if (date.getDay() === 6 && day !== daysInMonth) {
+          row = table.insertRow();
+        }
+      }
+    }
+
+    function prevMonth() {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar();
+    }
+
+    function nextMonth() {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar();
+    }
+
+    function selectDate(cell) {
+      document.querySelectorAll('td.selected').forEach(c => c.classList.remove('selected'));
+      cell.classList.add('selected');
+    }
+
+    function calculateNextInstallDate() {
+      const selectedCell = document.querySelector('td.selected');
+      if (!selectedCell) {
+        alert('Please select a date.');
+        return;
+      }
+
+      const interval = parseInt(document.getElementById('interval').value, 10);
+      let installDate = new Date(selectedCell.getAttribute('data-date'));
+      installDate.setDate(installDate.getDate() + interval);
+
+      // Skip weekends and holidays
+      while (
+        installDate.getDay() === 0 ||
+        installDate.getDay() === 6 ||
+        holidays.includes(installDate.toISOString().split('T')[0])
+      ) {
+        installDate.setDate(installDate.getDate() + 1);
+      }
+
+      const noticeDate = new Date(installDate);
+      noticeDate.setDate(noticeDate.getDate() - interval);
+
+      document.getElementById('nextInstallDate').innerText =
+        `Next Install Date: ${installDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+
+      document.getElementById('noticeDate').innerText =
+        `Notice Date: ${noticeDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', renderCalendar);
+  </script>
+</body>
+</html>
