@@ -2,7 +2,7 @@
 
 An interactive, browser-based tool that helps teams calculate onboarding and install timelines by accounting for weekends, holidays, and contract intervals. Built with HTML, CSS, and vanilla JavaScript, this tool is ideal for onboarding, sales, or implementation teams that need to manage client installation timelines with precision.
 
-## 🛠️ Features
+## Features
 
 - **Interactive Calendar:** Users can select any calendar date to anchor their calculation.
 - **Interval Selection:** Choose a preset interval (30, 60, or 90 days).
@@ -10,14 +10,14 @@ An interactive, browser-based tool that helps teams calculate onboarding and ins
 - **Notice Date Calculation:** Calculates a backdated "Notice Date" based on the selected interval.
 - **Responsive UX:** Lightweight and easy to deploy without dependencies.
 
-## 📋 Use Case
+## Use Case
 
 Originally developed to support internal Sales and Onboarding teams, this tool streamlines install scheduling by factoring in non-working days. It's useful for:
 - Client onboarding
 - Contract start date calculations
 - Sales planning and implementation workflows
 
-## 💡 Customization
+## Customization
 
 To adapt the calculator for your organization:
 - Replace the values in the `holidays` array with your own national/company holidays.
