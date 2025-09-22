@@ -1,4 +1,4 @@
-# 📅 Install Date Calculator
+# Install Date Calculator
 
 An interactive, browser-based tool that helps teams calculate onboarding and install timelines by accounting for weekends, holidays, and contract intervals. Built with HTML, CSS, and vanilla JavaScript, this tool is ideal for onboarding, sales, or implementation teams that need to manage client installation timelines with precision.
 
